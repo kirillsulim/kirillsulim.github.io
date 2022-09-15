@@ -1,0 +1,404 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>Strict YAML deserialization with marshmallow</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="/assets/css/styles.css" />
+</head>
+
+<body class="is-preload">
+	<div id="wrapper">
+		<div id="main">
+			<div class="inner">
+
+				<header id="header">
+					<span href="#" class="logo">
+						<h2>Strict YAML deserialization with marshmallow</h2>
+					</span>
+				</header>
+
+				<section id="banner">
+					<div class="content">
+						<h2 id="the-problem">The problem</h2>
+
+<ul>
+  <li>I want to read some not so simple config from .yaml file.</li>
+  <li>I have config structure described as dataclasses.</li>
+  <li>I want to all type checks have been performed and in case of invalid data exception will be raised.</li>
+</ul>
+
+<p>So basically I want something like</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">strict_load_yaml</span><span class="p">(</span><span class="n">yaml</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">loaded_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span>
+    <span class="s">"""
+    Here is some magic
+    """</span>
+    <span class="k">pass</span>
+</code></pre></div></div>
+
+<p>And then use it like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">MyConfig</span><span class="p">:</span>
+    <span class="s">"""
+    Here is object tree
+    """</span>
+    <span class="k">pass</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">strict_load_yamp</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">"config.yaml"</span><span class="p">,</span> <span class="s">"w"</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">MyConfig</span><span class="p">)</span>
+<span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">"Config is invalid"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="config-classes">Config classes</h2>
+
+<p>Here is my <code class="highlighter-rouge">config.py</code> file with example dataclasses:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+
+<span class="k">class</span> <span class="nc">Color</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="s">"red"</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="s">"green"</span>
+    <span class="n">BLUE</span> <span class="o">=</span> <span class="s">"blue"</span>
+
+
+<span class="o">@</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">BattleStationConfig</span><span class="p">:</span>
+    <span class="o">@</span><span class="n">dataclass</span>
+    <span class="k">class</span> <span class="nc">Processor</span><span class="p">:</span>
+        <span class="n">core_count</span><span class="p">:</span> <span class="nb">int</span>
+        <span class="n">manufacturer</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">processor</span><span class="p">:</span> <span class="n">Processor</span>
+    <span class="n">memory_gb</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">led_color</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Color</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+</code></pre></div></div>
+
+<h2 id="solution-that-didnt-work">Solution that didn’t work</h2>
+
+<p>This is a very common pattern, right?
+It must be very easy. 
+Just import standard yaml library and problem solved?</p>
+
+<p>So I imported <a href="https://github.com/yaml/pyyaml">PyYaml</a> and call <code class="highlighter-rouge">load</code> method:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+
+<span class="kn">from</span> <span class="nn">yaml</span> <span class="kn">import</span> <span class="n">load</span><span class="p">,</span> <span class="n">SafeLoader</span>
+
+
+<span class="n">yaml</span> <span class="o">=</span> <span class="s">"""
+processor:
+  core_count: 8
+  manufacturer: Intel
+memory_gb: 8
+led_color: red
+"""</span>
+
+<span class="n">loaded</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">yaml</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">SafeLoader</span><span class="p">)</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">loaded</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>and I have got:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'led_color': 'red',
+ 'memory_gb': 8,
+ 'processor': {'core_count': 8, 'manufacturer': 'Intel'}}
+</code></pre></div></div>
+
+<p>Yaml loaded just fine, but it is a dict.
+No problem, I can pass it as <code class="highlighter-rouge">**args</code> constructor:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">parsed_config</span> <span class="o">=</span> <span class="n">BattleStationConfig</span><span class="p">(</span><span class="o">**</span><span class="n">loaded</span><span class="p">)</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">parsed_config</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>and result will be:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BattleStationConfig(processor={'core_count': 8, 'manufacturer': 'Intel'}, memory_gb=8, led_color='red')
+</code></pre></div></div>
+
+<p>Wow! Easy! But… Wait. Is processor field a dict? Damn it.</p>
+
+<p>Python don’t perform type checking at constructor and do not parse <code class="highlighter-rouge">Processor</code> class.
+Well, this is the time to go to stackowerflow.</p>
+
+<h2 id="solution-that-required-yaml-tags-and-almost-works">Solution that required yaml tags and almost works</h2>
+
+<p>I’ve read stackowerflow answers and PyYaml documentation and have found out that you can mark your yaml doc with tags for types.
+Your classes must be descendants of <code class="highlighter-rouge">YAMLObject</code> and so my <code class="highlighter-rouge">config_with_tag.py</code> will look like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">yaml</span> <span class="kn">import</span> <span class="n">YAMLObject</span><span class="p">,</span> <span class="n">SafeLoader</span>
+
+
+<span class="k">class</span> <span class="nc">Color</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="s">"red"</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="s">"green"</span>
+    <span class="n">BLUE</span> <span class="o">=</span> <span class="s">"blue"</span>
+
+
+<span class="o">@</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">BattleStationConfig</span><span class="p">(</span><span class="n">YAMLObject</span><span class="p">):</span>
+    <span class="n">yaml_tag</span> <span class="o">=</span> <span class="s">"!BattleStationConfig"</span>
+    <span class="n">yaml_loader</span> <span class="o">=</span> <span class="n">SafeLoader</span>
+
+    <span class="o">@</span><span class="n">dataclass</span>
+    <span class="k">class</span> <span class="nc">Processor</span><span class="p">(</span><span class="n">YAMLObject</span><span class="p">):</span>
+        <span class="n">yaml_tag</span> <span class="o">=</span> <span class="s">"!Processor"</span>
+        <span class="n">yaml_loader</span> <span class="o">=</span> <span class="n">SafeLoader</span>
+
+        <span class="n">core_count</span><span class="p">:</span> <span class="nb">int</span>
+        <span class="n">manufacturer</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">processor</span><span class="p">:</span> <span class="n">Processor</span>
+    <span class="n">memory_gb</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">led_color</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Color</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+</code></pre></div></div>
+
+<p>And loading code:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+
+<span class="kn">from</span> <span class="nn">yaml</span> <span class="kn">import</span> <span class="n">load</span><span class="p">,</span> <span class="n">SafeLoader</span>
+
+<span class="kn">from</span> <span class="nn">config_with_tag</span> <span class="kn">import</span> <span class="n">BattleStationConfig</span>
+
+
+<span class="n">yaml</span> <span class="o">=</span> <span class="s">"""
+--- !BattleStationConfig
+processor: !Processor
+  core_count: 8
+  manufacturer: Intel
+memory_gb: 8
+led_color: red
+"""</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">BattleStationConfig</span>
+
+<span class="n">loaded</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">yaml</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">SafeLoader</span><span class="p">)</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">loaded</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>And what I will get?</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BattleStationConfig(processor=BattleStationConfig.Processor(core_count=8, manufacturer='Intel'), memory_gb=8, led_color='red')
+</code></pre></div></div>
+
+<p>Good. But my YAML is full of tags and lost its readability. And <code class="highlighter-rouge">Color</code> is still string. So I can just add <code class="highlighter-rouge">YAMLObject</code> to parent classes? Right? No.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Color</span><span class="p">(</span><span class="n">Enum</span><span class="p">,</span> <span class="n">YAMLObject</span><span class="p">):</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="s">"red"</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="s">"green"</span>
+    <span class="n">BLUE</span> <span class="o">=</span> <span class="s">"blue"</span>
+</code></pre></div></div>
+
+<p>Will lead to:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TypeError: metaclass conflict: the metaclass of a derived class must be a (non-strict) subclass of the metaclasses of all its bases
+</code></pre></div></div>
+
+<p>I didn’t find a quick way to resolve it. And I did want to add tags to my yaml, so I’ve decided to keep looking for a solution.</p>
+
+<h2 id="solution-with-marshmallow">Solution with marshmallow</h2>
+
+<p>I found a recommendation to use <a href="https://github.com/marshmallow-code/marshmallow">marshmallow</a> to parse dict generated from JSON object.
+I decided that these cases are the same as mine only uses JSON instead of YAML. 
+And so I tried to use <code class="highlighter-rouge">class_schema</code> generator for dataclass schema:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+
+<span class="kn">from</span> <span class="nn">yaml</span> <span class="kn">import</span> <span class="n">load</span><span class="p">,</span> <span class="n">SafeLoader</span>
+<span class="kn">from</span> <span class="nn">marshmallow_dataclass</span> <span class="kn">import</span> <span class="n">class_schema</span>
+
+<span class="kn">from</span> <span class="nn">config</span> <span class="kn">import</span> <span class="n">BattleStationConfig</span>
+
+
+<span class="n">yaml</span> <span class="o">=</span> <span class="s">"""
+processor:
+  core_count: 8
+  manufacturer: Intel
+memory_gb: 8
+led_color: red
+"""</span>
+
+<span class="n">loaded</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">yaml</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">SafeLoader</span><span class="p">)</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">loaded</span><span class="p">)</span>
+
+<span class="n">BattleStationConfigSchema</span> <span class="o">=</span> <span class="n">class_schema</span><span class="p">(</span><span class="n">BattleStationConfig</span><span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">BattleStationConfigSchema</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">loaded</span><span class="p">)</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>And I get:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>marshmallow.exceptions.ValidationError: {'led_color': ['Invalid enum member red']}
+</code></pre></div></div>
+
+<p>So, marshmallow wants enum name, not value. I can change my yaml to:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">processor</span><span class="pi">:</span>
+  <span class="na">core_count</span><span class="pi">:</span> <span class="m">8</span>
+  <span class="na">manufacturer</span><span class="pi">:</span> <span class="s">Intel</span>
+<span class="na">memory_gb</span><span class="pi">:</span> <span class="m">8</span>
+<span class="na">led_color</span><span class="pi">:</span> <span class="s">RED</span>
+</code></pre></div></div>
+
+<p>And I will get my ideally deserialized object:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BattleStationConfig(processor=BattleStationConfig.Processor(core_count=8, manufacturer='Intel'), memory_gb=8, led_color=&lt;Color.RED: 'red'&gt;)
+</code></pre></div></div>
+
+<p>But I felt there was a way to use my original yaml. 
+So I’ve explored marshmallow documentation and found following lines:</p>
+
+<blockquote>
+  <p>Setting <code class="highlighter-rouge">by_value=True</code>. This will cause both dumping and loading to use the value of the enum.</p>
+</blockquote>
+
+<p>Turn out, you can pass this configuration to <code class="highlighter-rouge">metadata</code> dictionary of <code class="highlighter-rouge">field</code> generator from dataclasses like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">BattleStationConfig</span><span class="p">:</span>
+    <span class="n">led_color</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Color</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s">"by_value"</span><span class="p">:</span> <span class="bp">True</span><span class="p">})</span>
+</code></pre></div></div>
+
+<p>And I will get the object parsed from my original yaml.</p>
+
+<h2 id="magic-function">Magic function</h2>
+
+<p>And after all I can collect my magic function:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">strict_load_yaml</span><span class="p">(</span><span class="n">yaml</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">loaded_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="n">class_schema</span><span class="p">(</span><span class="n">loaded_type</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">schema</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">load</span><span class="p">(</span><span class="n">yaml</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">SafeLoader</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>This function can require additional set up for dataclass but solve my problem and do not require tags in yaml.</p>
+
+<h2 id="some-words-about-forwardref">Some words about ForwardRef</h2>
+
+<p>If you define your dataclasses with forward reference (string with class name) marshmallow can be confused and didn’t parse your classes.</p>
+
+<p>For example this configuration</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">ForwardRef</span>
+
+
+<span class="o">@</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">BattleStationConfig</span><span class="p">:</span>
+    <span class="n">processor</span><span class="p">:</span> <span class="n">ForwardRef</span><span class="p">(</span><span class="s">"Processor"</span><span class="p">)</span>
+    <span class="n">memory_gb</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">led_color</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s">"Color"</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s">"by_value"</span><span class="p">:</span> <span class="bp">True</span><span class="p">})</span>
+
+    <span class="o">@</span><span class="n">dataclass</span>
+    <span class="k">class</span> <span class="nc">Processor</span><span class="p">:</span>
+        <span class="n">core_count</span><span class="p">:</span> <span class="nb">int</span>
+        <span class="n">manufacturer</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="k">class</span> <span class="nc">Color</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="s">"red"</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="s">"green"</span>
+    <span class="n">BLUE</span> <span class="o">=</span> <span class="s">"blue"</span>
+
+</code></pre></div></div>
+
+<p>will lead to</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>marshmallow.exceptions.RegistryError: Class with name 'Processor' was not found. You may need to import the class.
+</code></pre></div></div>
+
+<p>And if we move <code class="highlighter-rouge">Processor</code> class upper marshmallow will lost <code class="highlighter-rouge">Color</code> with the same error. 
+So keep your classes without ForwardRef if possible.</p>
+
+<h2 id="code">Code</h2>
+
+<p>All code available on <a href="https://github.com/kirillsulim/python-strict-yaml-parsing">GitHub repository</a>.</p>
+
+					</div>
+				</section>
+			</div>
+		</div>
+
+		<div id="sidebar">
+  <div class="inner">
+    <!-- Menu -->
+    <nav id="menu">
+      <div class="image main round">
+        <img src="/assets/images/me.jpeg" alt="Me" />
+      </div>
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="/index.html">Homepage</a></li>
+        <li><a href="/projects.html">Projects</a></li>
+        <li><a href="/katas.html">Code katas</a></li>
+        <li><a href="/blog.html">Blog</a></li>
+        <li>
+          <span class="opener active">Posts</span>
+          <ul>
+            
+            <li><a href="/2020/10/13/cv-continuouse-delivery.html">2020-10-13 CV continuous delivery</a></li>
+            
+            <li><a href="/2020/09/07/one-man-scrum-iter-1-fail-iter-2-planning.html">2020-09-07 One man scrum. React blog. Iteration 1: failed. Iteration 2: planning.</a></li>
+            
+            <li><a href="/2020/08/27/one-man-scrum-iter-1-planning.html">2020-08-27 One man scrum. React blog. Iteration 1: planning.</a></li>
+            
+            <li><a href="/2020/08/26/planning-part-2.html">2020-08-26 React blog project planning part 2</a></li>
+            
+            <li><a href="/2020/08/25/planning.html">2020-08-25 React blog project planning part 1</a></li>
+            
+            <li><a href="/2020/08/05/python-strict-yaml-deserialization.html">2020-08-05 Strict YAML deserialization with marshmallow</a></li>
+            
+            <li><a href="/2020/06/18/how-my-blog-works.html">2020-06-18 How my blog works</a></li>
+            
+            <li><a href="/2019/12/17/second-planning.html">2019-12-17 Second planning attempt</a></li>
+            
+            <li><a href="/2019/12/14/planning.html">2019-12-14 Planning</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">Design based on: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+
+  </div>
+</div>
+	</div>
+
+	<!-- Scripts -->
+	<script src="/assets/js/jquery.min.js"></script>
+	<script src="/assets/js/browser.min.js"></script>
+	<script src="/assets/js/breakpoints.min.js"></script>
+	<script src="/assets/js/util.js"></script>
+	<script src="/assets/js/main.js"></script>
+
+</body>
+
+</html>

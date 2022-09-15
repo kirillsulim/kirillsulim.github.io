@@ -1,0 +1,378 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>How my blog works</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="/assets/css/styles.css" />
+</head>
+
+<body class="is-preload">
+	<div id="wrapper">
+		<div id="main">
+			<div class="inner">
+
+				<header id="header">
+					<span href="#" class="logo">
+						<h2>How my blog works</h2>
+					</span>
+				</header>
+
+				<section id="banner">
+					<div class="content">
+						<p>So here is a detailed explanation of how my blog works.</p>
+
+<h2 id="nostalgia-moment">Nostalgia moment</h2>
+
+<p>I’ve tried to create my own blog dozen of times.
+My first blog was just a wordpress page on free hosting.
+Then I started to learn Django and decided to write my blog using it.
+Then Django lost its popularity and shine and I decided to write my blog on Node.js.
+Then TypeScript became almost mainstream for any serious project.
+But the problem was: I am not a blog person. 
+My <a href="https://github.com/kirillsulim">github</a> can tell a lot about me, but I am too lazy or too shy to write every day a short post about some
+hack I used in .sh script or tricky SQL request.</p>
+
+<p>But then I decided to consider my blog not as interesting programming task but as a product.
+And with product came the planning. 
+<a href="/2019/12/14/planning.html">The first plan</a> and <a href="/2019/12/17/second-planning.html">the corrected version</a>.
+And after all those years I created my blog.</p>
+
+<h2 id="jekyll">Jekyll</h2>
+
+<p>I decided to start from static site because all my attempts to wrige blog engine was stopped due to lack of interests at some time.
+There was 3 options I considered:</p>
+
+<ol>
+  <li><a href="https://jekyllrb.com/">Jekyll</a>. Well documented old Ruby-based static site generator.</li>
+  <li><a href="https://gohugo.io/">Hugo</a>. Shiney new pragmatic static generator written on Go lang.</li>
+  <li><a href="https://www.gatsbyjs.org/">Gatsby</a>. Static site with React.</li>
+</ol>
+
+<p>I’ve started with Jekyll. It was an easy and working solution althoug the most boring choice.
+I was very concerned about ruby due to its loss of popularity in last decade. 
+But I decided that if I would choose Jekyll I will use Docker to avoid dependency loading. 
+It was almost 2020 and if I use technologies of previouse decade I should add some contemporary flavour.</p>
+
+<p>Then I tried Gatsby. I discovered that my lack of expirience with React significantly slow me down and decided to drop that option.</p>
+
+<p>I’ve tried Hugo but honestly I do not remember why I decided not to use it.</p>
+
+<p>And so I choose tecnology but then I had to choode design.
+I was very frustrated with default Jekyll design and decided to create my own template based on some beautifull responsive template.
+I quickly looked at <a href="https://getbootstrap.com/">Bootstrap</a> and <a href="https://get.foundation/">Zurb Foundation framework</a>. 
+But then I found <a href="https://html5up.net/">HTML5 UP</a> and I’ve understand. 
+That is it. 
+Simple. 
+I dont have to know a lot about CSS. 
+And distributed with CC license.</p>
+
+<p>I’ve downloaded template and adapted it to use as Jekyll layout. 
+And the hardest part for me was done.</p>
+
+<h2 id="makefile">Makefile</h2>
+
+<p>I am a backend engineer from backend clan. And althogh I’ve painted and created art in my life I’ve almost never worked on frondtend in my career.
+So here begins the fun.</p>
+
+<p>I decided to use makefile because it has a better structure than a .sh script.
+Personally I dislike makefiles. Today I would use <code class="highlighter-rouge">make_mode()</code> of <a href="https://github.com/dogebuild">dogebuild</a>. I found syntax of makefile unfriendly and hard to remember.
+I think the reason is I use slightly sophisticated makefiles once a year and that is why its syntax drives me crazy.</p>
+
+<p>Anyway. Here is my makefile:</p>
+
+<pre><code class="language-Makefile"># Makefile for all stuff
+
+cwd := $(shell pwd)
+jekyll_version := 3.8
+html_proofer_version := latest
+package_suffix ?= $(shell date --utc +%Y%m%d_%H%M%S)
+
+build:
+	docker run --rm --volume="$(cwd):/srv/jekyll" -it jekyll/jekyll:$(jekyll_version) jekyll build
+
+check: build
+	docker run -v "$(cwd)/_site:/mounted-site" 18fgsa/html-proofer:$(html_proofer_version) /mounted-site --disable-external
+	# docker run --rm --volume="$(cwd):/srv/jekyll" -it jekyll/jekyll:$(jekyll_version) jekyll doctor
+
+serve: check
+	docker run --rm --volume="$(cwd):/srv/jekyll" -p 4000:4000 -it jekyll/jekyll:$(jekyll_version) jekyll serve
+
+package: check
+	tar -czvf su0.io_$(package_suffix).tar.gz _site/
+</code></pre>
+
+<ol>
+  <li>Build: Just run Jekyll from docker container and pass current directory as volume. Very easy in 2020.</li>
+  <li>Check: I found out that there is some static analisys for static sites (pun intended). And as a backend developer with great baackground I couldn’t pass by.</li>
+  <li>Serve: Run my static site locally to see what I’ve done.</li>
+  <li>Package: Just pack all generated content into .tar.gz archive. See Artifact section below for more details</li>
+</ol>
+
+<h2 id="git">Git</h2>
+
+<p>I am a fan of CI and CD and I like to set up deploment process based on branches.
+For example all code in testing branch is deployed to test environment. 
+All code in master branch will be deployed on production. 
+And for my blog I use the same approach.</p>
+
+<h2 id="travis">Travis</h2>
+
+<p>I use travis CI for all of my open-source project.
+I cannot say it is perfect but travis CI is great.
+It is free, easy to configure and well documented.
+I use folowing config:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">language</span><span class="pi">:</span> <span class="s">minimal</span>
+
+<span class="na">before_script</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">export PACKAGE_SUFFIX=$(date --utc +'%Y%m%d_%H%M%S')</span>
+
+<span class="na">script</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">mkdir _site &amp;&amp; make package package_suffix=${PACKAGE_SUFFIX}</span>
+
+<span class="na">before_deploy</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">git config --local user.name "Kirill Sulim"</span>
+    <span class="pi">-</span> <span class="s">git config --local user.email "kirillsulim@gmail.com"</span>
+    <span class="pi">-</span> <span class="s">git tag ${PACKAGE_SUFFIX}</span>
+
+<span class="na">deploy</span><span class="pi">:</span>
+    <span class="na">provider</span><span class="pi">:</span> <span class="s">releases</span>
+    <span class="na">api_key</span><span class="pi">:</span> <span class="s">${GITHUB_OAUTH_TOKEN}</span>
+    <span class="na">file_glob</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">file</span><span class="pi">:</span> <span class="s2">"</span><span class="s">*.tar.gz"</span>
+    <span class="na">skip_cleanup</span><span class="pi">:</span> <span class="no">true</span>
+</code></pre></div></div>
+
+<p>I only need make, docker and tar archiver so I use minimal configuration.</p>
+
+<p>Before section sets up tag for my arifact. It is just current date and time.</p>
+
+<p>Script section run makefile to perfom build and package.</p>
+
+<p>Before deploy section sets up git configuration to properly tag release.</p>
+
+<p>Deploy section deploy my artifact to github.</p>
+
+<h2 id="artifact">Artifact</h2>
+
+<p>And so my site is builded and only static pages are packed into tar.gz and published to github.</p>
+
+<h2 id="python-polling-daemon">Python polling daemon</h2>
+
+<p>My first idea to keep my blog synchronized with resource was to create web-hook.
+But then I realize that it will require to set up web server.
+Too much for simple static blog and I decided to use simple python script runned as systemd serice with timer.</p>
+
+<p>Python script:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+
+<span class="n">KEEP_SNAPSHOT_COUNT</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="n">ARCHIVE_FILE</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s">'su0.io_current.tar.gz'</span><span class="p">)</span>
+<span class="n">LATEST_FILE</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s">'latest_version'</span><span class="p">)</span>
+
+
+<span class="n">rsp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://api.github.com/repos/kirillsulim/blog-jekyll/releases/latest'</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">rsp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+<span class="n">archive</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">el</span><span class="p">:</span> <span class="n">el</span><span class="p">[</span><span class="s">'name'</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">'su0.io'</span><span class="p">),</span> <span class="n">data</span><span class="p">[</span><span class="s">'assets'</span><span class="p">]))</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">archive</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">'Cannot extravt archive link from:</span><span class="se">\n</span><span class="s">{}'</span><span class="o">.</span><span class="nb">format</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">archive_url</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">'browser_download_url'</span><span class="p">]</span>
+<span class="n">tag</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">'tag_name'</span><span class="p">]</span>
+
+<span class="k">if</span> <span class="n">LATEST_FILE</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">LATEST_FILE</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span> <span class="o">==</span> <span class="n">tag</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">'Latest version already installed'</span><span class="p">)</span>
+    <span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="n">gzip</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">archive_url</span><span class="p">)</span>
+
+<span class="n">ARCHIVE_FILE</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">gzip</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+
+<span class="n">snapshots_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s">'snapshots'</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<span class="n">site_path</span> <span class="o">=</span> <span class="n">snapshots_path</span> <span class="o">/</span> <span class="n">tag</span> 
+
+<span class="n">tarfile</span><span class="o">.</span><span class="nb">open</span><span class="p">(</span><span class="n">ARCHIVE_FILE</span><span class="p">)</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">site_path</span><span class="p">)</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="n">site_path</span> <span class="o">/</span> <span class="s">'_site'</span><span class="p">,</span> <span class="s">'/var/www/blog.tmp'</span><span class="p">,</span> <span class="n">target_is_directory</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s">'/var/www/blog.tmp'</span><span class="p">,</span> <span class="s">'/var/www/blog'</span><span class="p">)</span>
+
+<span class="n">LATEST_FILE</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+<span class="n">ARCHIVE_FILE</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span> <span class="c1"># Remove file
+</span>
+<span class="n">snapshots</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+    <span class="nb">list</span><span class="p">(</span><span class="n">snapshots_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">'*'</span><span class="p">)),</span> 
+    <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">folder</span><span class="p">:</span> <span class="n">folder</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">,</span> 
+    <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="n">snapshots</span><span class="p">[</span><span class="n">KEEP_SNAPSHOT_COUNT</span><span class="p">:]:</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">snapshot</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>.service file:</p>
+
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">[Unit]</span>
+<span class="py">Description</span><span class="p">=</span><span class="s">Runs blog updater</span>
+<span class="py">Wants</span><span class="p">=</span><span class="s">blog-upfater.timer</span>
+
+<span class="nn">[Service]</span>
+<span class="py">ExecStart</span><span class="p">=</span><span class="s">/usr/bin/python3 /srv/blog/updater.py</span>
+<span class="py">WorkingDirectory</span><span class="p">=</span><span class="s">/srv/blog</span>
+
+<span class="nn">[Install]</span>
+<span class="py">WantedBy</span><span class="p">=</span><span class="s">multi-user.target</span>
+</code></pre></div></div>
+
+<p>.timer file:</p>
+
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">[Unit]</span>
+<span class="py">Description</span><span class="p">=</span><span class="s">Run blog-updater.service periodically</span>
+<span class="py">Requires</span><span class="p">=</span><span class="s">blog-updater.service</span>
+
+<span class="nn">[Timer]</span>
+<span class="py">Unit</span><span class="p">=</span><span class="s">blog-updater.service</span>
+<span class="py">OnUnitInactiveSec</span><span class="p">=</span><span class="s">15m</span>
+
+<span class="nn">[Install]</span>
+<span class="py">WantedBy</span><span class="p">=</span><span class="s">timers.target</span>
+</code></pre></div></div>
+
+<p>And ansible playbook to install all gears:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">hosts</span><span class="pi">:</span> <span class="s">blog</span>
+  <span class="na">gather_facts</span><span class="pi">:</span> <span class="s">True</span>
+  
+  <span class="na">tasks</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Create a directory for blog</span>
+    <span class="na">file</span><span class="pi">:</span>
+      <span class="na">path</span><span class="pi">:</span> <span class="s">/srv/blog</span>
+      <span class="na">state</span><span class="pi">:</span> <span class="s">directory</span>
+
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Install updater.py</span>
+    <span class="na">copy</span><span class="pi">:</span> 
+      <span class="na">src</span><span class="pi">:</span> <span class="s">updater.py</span>
+      <span class="na">dest</span><span class="pi">:</span> <span class="s">/srv/blog/updater.py</span>
+
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Install blog-updater.service</span>
+    <span class="na">copy</span><span class="pi">:</span> 
+      <span class="na">src</span><span class="pi">:</span> <span class="s">blog-updater.service</span>
+      <span class="na">dest</span><span class="pi">:</span> <span class="s">/etc/systemd/system/blog-updater.service</span>
+
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Install blog-updater.timer</span>
+    <span class="na">copy</span><span class="pi">:</span> 
+      <span class="na">src</span><span class="pi">:</span> <span class="s">blog-updater.timer</span>
+      <span class="na">dest</span><span class="pi">:</span> <span class="s">/etc/systemd/system/blog-updater.timer</span>
+
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Start blog-updater.timer</span>
+    <span class="na">systemd</span><span class="pi">:</span> 
+      <span class="na">state</span><span class="pi">:</span> <span class="s">started</span> 
+      <span class="na">enabled</span><span class="pi">:</span> <span class="s">yes</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">blog-updater.timer</span> 
+      <span class="na">daemon_reload</span><span class="pi">:</span> <span class="s">yes</span>
+
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Copy config file</span>
+    <span class="na">copy</span><span class="pi">:</span> 
+      <span class="na">src</span><span class="pi">:</span> <span class="s">blog.conf</span>
+      <span class="na">dest</span><span class="pi">:</span> <span class="s">/etc/nginx/sites-available/blog.conf</span>
+  
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Activate config file</span>
+    <span class="na">file</span><span class="pi">:</span> 
+      <span class="na">src</span><span class="pi">:</span> <span class="s">/etc/nginx/sites-available/blog.conf</span>
+      <span class="na">dest</span><span class="pi">:</span> <span class="s">/etc/nginx/sites-enabled/blog.conf</span>
+      <span class="na">state</span><span class="pi">:</span> <span class="s">link</span>
+
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Restart nginx</span>
+    <span class="na">service</span><span class="pi">:</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">nginx</span>
+      <span class="na">state</span><span class="pi">:</span> <span class="s">restarted</span>
+</code></pre></div></div>
+
+<p>Every 15 minutes systemd runs script.
+This script checks latest published releases on github and install latest release if it is not installed yet.</p>
+
+<p>And this is how my blog works.</p>
+
+					</div>
+				</section>
+			</div>
+		</div>
+
+		<div id="sidebar">
+  <div class="inner">
+    <!-- Menu -->
+    <nav id="menu">
+      <div class="image main round">
+        <img src="/assets/images/me.jpeg" alt="Me" />
+      </div>
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="/index.html">Homepage</a></li>
+        <li><a href="/projects.html">Projects</a></li>
+        <li><a href="/katas.html">Code katas</a></li>
+        <li><a href="/blog.html">Blog</a></li>
+        <li>
+          <span class="opener active">Posts</span>
+          <ul>
+            
+            <li><a href="/2020/10/13/cv-continuouse-delivery.html">2020-10-13 CV continuous delivery</a></li>
+            
+            <li><a href="/2020/09/07/one-man-scrum-iter-1-fail-iter-2-planning.html">2020-09-07 One man scrum. React blog. Iteration 1: failed. Iteration 2: planning.</a></li>
+            
+            <li><a href="/2020/08/27/one-man-scrum-iter-1-planning.html">2020-08-27 One man scrum. React blog. Iteration 1: planning.</a></li>
+            
+            <li><a href="/2020/08/26/planning-part-2.html">2020-08-26 React blog project planning part 2</a></li>
+            
+            <li><a href="/2020/08/25/planning.html">2020-08-25 React blog project planning part 1</a></li>
+            
+            <li><a href="/2020/08/05/python-strict-yaml-deserialization.html">2020-08-05 Strict YAML deserialization with marshmallow</a></li>
+            
+            <li><a href="/2020/06/18/how-my-blog-works.html">2020-06-18 How my blog works</a></li>
+            
+            <li><a href="/2019/12/17/second-planning.html">2019-12-17 Second planning attempt</a></li>
+            
+            <li><a href="/2019/12/14/planning.html">2019-12-14 Planning</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">Design based on: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+
+  </div>
+</div>
+	</div>
+
+	<!-- Scripts -->
+	<script src="/assets/js/jquery.min.js"></script>
+	<script src="/assets/js/browser.min.js"></script>
+	<script src="/assets/js/breakpoints.min.js"></script>
+	<script src="/assets/js/util.js"></script>
+	<script src="/assets/js/main.js"></script>
+
+</body>
+
+</html>

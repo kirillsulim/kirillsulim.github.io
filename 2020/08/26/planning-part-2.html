@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>React blog project planning part 2</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="/assets/css/styles.css" />
+</head>
+
+<body class="is-preload">
+	<div id="wrapper">
+		<div id="main">
+			<div class="inner">
+
+				<header id="header">
+					<span href="#" class="logo">
+						<h2>React blog project planning part 2</h2>
+					</span>
+				</header>
+
+				<section id="banner">
+					<div class="content">
+						<p>Let’s start with decomposition.</p>
+
+<h2 id="decomposition">Decomposition</h2>
+
+<p>I decomposed my project into following user stories</p>
+
+<ul>
+  <li>Learn Zurb Foundation: As a Developer I want to learn basic usages of Zurb Foundation so I can develop interfaces
+    <ul>
+      <li>Learn Zurb Foundation: As a Developer I want to learn basic usages of Zurb Foundation so I can develop interfaces</li>
+    </ul>
+  </li>
+  <li>Learn Nest.js: As a Developer I want to learn nest.js so I can develop backend
+    <ul>
+      <li>Create hello world Nest.js site: As a Developer I want to learn how to create hello world nest.js site so I can build backend later</li>
+      <li>Create form with Nest.js React and Foundation: As a Developer I want to learn how to create forms with Zurb Foundation, React and Nest,js so I can build an MVP project later</li>
+    </ul>
+  </li>
+  <li>Learn Kubernetes: As a DevOps I want to learn how to work with Kubernetes so I can set up infrastructure later
+    <ul>
+      <li>Simple pods in kubernetes: As a DevOps I want to learn how to run simple service in kubernetes so I can run production services later</li>
+      <li>Set up kubernetes on server: As a DevOps I want to learn how to set up kubernetes on server so I can set up infrastructure for production</li>
+      <li>Key storage with kubernetes: As a DevOps I want to learn how to store keys and passwords in kubernetes so I can set up kubernetes for production</li>
+    </ul>
+  </li>
+  <li>Infrastructure: As a Developer I want to use infrastructure so I can focus on features instead of delivery process
+    <ul>
+      <li>Database migrations: As a Developer I want to have migration framework set up	so I can not to not be distracted with manual migrations</li>
+      <li>Data backup: As a Developer I want to have backup set up so I can not to be afraid of losing data</li>
+      <li>CI &amp; CD: As a Developer I want to have continious deliverey set up so I can not to spend time on manual deploy</li>
+      <li>Key storage: As a Developer I want to have key storage set up so I can not to store keys and passwords in repo or txt on instance</li>
+      <li>Metrics: As a DevOps I want to have metrics on services so I can understand what happens to service</li>
+      <li>Logging: As a Developer I want to have log service so I can debug errors</li>
+      <li>Tracing: As a Developer I want to have tracing on services so I can debug errors</li>
+    </ul>
+  </li>
+  <li>Image service: As a Developer I want to store images in separate service so I can use resized images in common maneer across many services
+    <ul>
+      <li>Upload image: As a Developer I want to have API to aloow user to upload images to storage so I can get image later on frontend</li>
+      <li>Get resized image: As a Developer I want to have API to get resized image with one request so I can show it in frontend</li>
+    </ul>
+  </li>
+  <li>Authorization service: As a Developer I want to authorize user across many services so I can avoid errors with authorization
+    <ul>
+      <li>Register: As a Developer I want to have API to Register user so I can allow registration in many services</li>
+      <li>Authenticate: As a Developer I want to have API to authenticate user so I can allow user to authenticate</li>
+      <li>Authenticate with google: As a Developer I want to have API to log in user with google account so I can allow user to authenticate easily</li>
+    </ul>
+  </li>
+  <li>Publish: As an Author I want to Publish posts so I can promote my personal brand
+    <ul>
+      <li>Authenticate: As an Author I want to log in to publisher so only me could write posts</li>
+      <li>Authenticate with google: As an Author I want to log in to publisher with google account so I can login easily</li>
+      <li>Publish on Yandex Zen: As an Author I want to publish on yandex zen so I can promote personal brand with popular blog platform</li>
+      <li>Publish on su0.io: As an Author I want to publish on su0.io	so I can my posts associated with my blog</li>
+      <li>Create post: As an Author I want to create post in .md redactor on admin panel so I can easily create and edit posts when I have no access to git repo or anithing dev-related</li>
+      <li>Syntax highlight: As an Author I want to have .md syntax highlighted so I can edit posts easy</li>
+      <li>Diagrams: As an Author I want to make diagrams in .md so I can avoid images for diagrams</li>
+    </ul>
+  </li>
+  <li>Comments: As a Reader I want to comment post so I can discuss topics
+    <ul>
+      <li>Register: As a Reader I want to register so I can write comments</li>
+      <li>Log in: As a Reader I want to login so I can write comments</li>
+      <li>Log in with google: As a Reader I want to login with google account	so I can write comments without long process of log in</li>
+      <li>Comment: As a Reader I want to write simple comments so I can discuss posts</li>
+      <li>Comments with .md: As a Reader I want to write comments with formulas and images so I can be specific when discussing complex stuff with formulas</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="estimation">Estimation</h2>
+
+<p>I fill <a href="https://docs.google.com/spreadsheets/d/1lOOvNDjSCl5XPfNrzS4E88az1ZR9D_s7rztrvic6jLU/edit?usp=sharing">table in Google Sheets</a> with user stories and put estimation in two cases:</p>
+
+<ul>
+  <li>SP50%: This is estiation in case everything goes normal</li>
+  <li>SP90%: This is estimation in worst case</li>
+</ul>
+
+<p>After that I calculated standard deviation and with 90% probability my project will take 94 story points.</p>
+
+<h2 id="stories-order">Stories order</h2>
+
+<p>My epics are highly dependent on each other so I have a strict order from the beginning. I will start from investigation of new technologies, after that I will set up infrastructure and at the end I will create services.</p>
+
+<p><em>Wish me luck =)</em></p>
+
+					</div>
+				</section>
+			</div>
+		</div>
+
+		<div id="sidebar">
+  <div class="inner">
+    <!-- Menu -->
+    <nav id="menu">
+      <div class="image main round">
+        <img src="/assets/images/me.jpeg" alt="Me" />
+      </div>
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="/index.html">Homepage</a></li>
+        <li><a href="/projects.html">Projects</a></li>
+        <li><a href="/katas.html">Code katas</a></li>
+        <li><a href="/blog.html">Blog</a></li>
+        <li>
+          <span class="opener active">Posts</span>
+          <ul>
+            
+            <li><a href="/2020/10/13/cv-continuouse-delivery.html">2020-10-13 CV continuous delivery</a></li>
+            
+            <li><a href="/2020/09/07/one-man-scrum-iter-1-fail-iter-2-planning.html">2020-09-07 One man scrum. React blog. Iteration 1: failed. Iteration 2: planning.</a></li>
+            
+            <li><a href="/2020/08/27/one-man-scrum-iter-1-planning.html">2020-08-27 One man scrum. React blog. Iteration 1: planning.</a></li>
+            
+            <li><a href="/2020/08/26/planning-part-2.html">2020-08-26 React blog project planning part 2</a></li>
+            
+            <li><a href="/2020/08/25/planning.html">2020-08-25 React blog project planning part 1</a></li>
+            
+            <li><a href="/2020/08/05/python-strict-yaml-deserialization.html">2020-08-05 Strict YAML deserialization with marshmallow</a></li>
+            
+            <li><a href="/2020/06/18/how-my-blog-works.html">2020-06-18 How my blog works</a></li>
+            
+            <li><a href="/2019/12/17/second-planning.html">2019-12-17 Second planning attempt</a></li>
+            
+            <li><a href="/2019/12/14/planning.html">2019-12-14 Planning</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">Design based on: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+
+  </div>
+</div>
+	</div>
+
+	<!-- Scripts -->
+	<script src="/assets/js/jquery.min.js"></script>
+	<script src="/assets/js/browser.min.js"></script>
+	<script src="/assets/js/breakpoints.min.js"></script>
+	<script src="/assets/js/util.js"></script>
+	<script src="/assets/js/main.js"></script>
+
+</body>
+
+</html>

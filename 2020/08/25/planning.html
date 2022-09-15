@@ -1,0 +1,234 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>React blog project planning part 1</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="/assets/css/styles.css" />
+</head>
+
+<body class="is-preload">
+	<div id="wrapper">
+		<div id="main">
+			<div class="inner">
+
+				<header id="header">
+					<span href="#" class="logo">
+						<h2>React blog project planning part 1</h2>
+					</span>
+				</header>
+
+				<section id="banner">
+					<div class="content">
+						<p>I will start with 10 questions from Agile Samurai book.</p>
+
+<h2 id="1-why-we-are-here">1. Why we are here</h2>
+
+<p><em>This is a quick reminder about why we are here, who our customers are, and why we decided to do this project in the first place.</em></p>
+
+<p>I want to:</p>
+
+<ol>
+  <li>Try more sophisticated plannign process.</li>
+  <li>Create React version of my blog.</li>
+</ol>
+
+<p>I am my own customer as usual.</p>
+
+<p>My project actualy is group of projects:</p>
+
+<ol>
+  <li>Authentification + Authorization service</li>
+  <li>Image manager: a service for store images and its resized variants.</li>
+  <li>Publisher framework: a service to publish post on many platforms, and blog is just one of them.</li>
+  <li>Actual blog engine based on <a href="https://reactjs.org/">React</a>.</li>
+  <li>Learn <a href="https://get.foundation/">Zurb Foundation CSS framework</a>. Or any alternative if Zurb foundation will not be suitable for my goals.</li>
+  <li>Learn <a href="https://kubernetes.io/">Kubernetes</a>.</li>
+</ol>
+
+<p>So my goal is not only get working product but learn some new technologies.</p>
+
+<h2 id="2-elevator-pitch">2. Elevator pitch</h2>
+
+<p>Here is group of projects:</p>
+
+<h3 id="authentification--authorization-service">Authentification + Authorization service</h3>
+<p>For me to authenticate user in many services.</p>
+
+<h3 id="image-manager">Image manager</h3>
+<p>For me to store images and solve resize problem in microservice-style. This is part of project infrastructure.</p>
+
+<h3 id="publish-framework">Publish framework</h3>
+<p>For me to publish posts not only to blog but also to different social networks. It could be transformed into commercial product in future.</p>
+
+<h3 id="blog-engine">Blog engine</h3>
+<p>For me to show my posts for social networks without extended interface.</p>
+
+<h2 id="3-design-product-box">3. Design product box</h2>
+
+<p>I will skip this part as usual.</p>
+
+<h2 id="4-create-a-not-list">4. Create a NOT list</h2>
+
+<p>This part will be hard, because it is already a monstrous bunch of microservices. But I will try anyway.</p>
+
+<ol>
+  <li>This is not commercial product yet.</li>
+</ol>
+
+<h2 id="5-meet-your-neighbors">5. Meet your neighbors</h2>
+
+<ul>
+  <li>Hello devops Kirill!</li>
+  <li>Hello developer Kirill!</li>
+</ul>
+
+<p>As usual I am my own devops and I want to use things like CI and tracing to make my life easier (or harder) and to learn new technoligies, so I should keep it in mind.</p>
+
+<h2 id="6-show-the-solution">6. Show the solution</h2>
+
+<h3 id="image-storage">Image storage</h3>
+
+<ul>
+  <li>Pyhton on backend (probably)</li>
+  <li>Pgsql for metadata storage (or sqite?)</li>
+  <li>Pod in k8s</li>
+</ul>
+
+<h3 id="publisher-framework">Publisher framework</h3>
+
+<ul>
+  <li><a href="https://nestjs.com/">Nest.js</a> on backend probably</li>
+  <li>React app with Zurb Foundation on frontend</li>
+  <li>Post draft saved to pgsql</li>
+  <li>Publishing to services is probably regular tasks reading <a href="https://www.rabbitmq.com/">Rabbit MQ</a> but this is questionable now. May be pgsql will be enough.</li>
+  <li>Pod in k8s</li>
+</ul>
+
+<h3 id="actual-blog">Actual blog</h3>
+
+<ul>
+  <li>May be just a static site for now.</li>
+  <li>Pod in k8s</li>
+</ul>
+
+<h2 id="7-ask-what-keeps-us-up-at-night">7. Ask what keeps us up at night</h2>
+
+<p>First of all, I looks too complicated. Overengineering as its finest. 
+But I have to clarify now. This is not a commercial project. It is more like enterprise-grade pet-project, so this is fine.</p>
+
+<h2 id="8-size-it-up">8. Size it up</h2>
+
+<p>This is a rough time estimation:</p>
+
+<ol>
+  <li>Authentication service. There should be many ready to use open-source projects, so I can just choose and set up one. One week.</li>
+  <li>Image service estimation is approximatley can be written in one week of regular work.</li>
+  <li>Publicher framework is much longer and in basic version is approximately fout weeks or one month of regular work.</li>
+  <li>React based blog is easy but I will have to learn a lot about frontend. so I estimate it as two weeks.</li>
+  <li>I’ve recently read a post about one guy who learned Kubernetes infrastructure in one month of evening work. So I estimate infrastructure part as 2 weeks.</li>
+</ol>
+
+<p>To summarize. Rough estimation of all work is ten weeks or two and a half month.</p>
+
+<h2 id="9-be-clear-on-whats-going-to-give">9. Be clear on what’s going to give.</h2>
+
+<h3 id="time">Time</h3>
+
+<ol>
+  <li>I wont restrict work on this project to some fixed time. Intead I will try to keep deliver some functionality regulary. Let’s call it “One man scrum”.</li>
+</ol>
+
+<h3 id="scope">Scope</h3>
+
+<p>Here are critical features:</p>
+
+<ol>
+  <li>I have to be able to publish my posts.</li>
+  <li>I have to be able to show published posts on my blog.</li>
+</ol>
+
+<p>All other feature are really optional. But as far I am not restricted in time I can continue work until I will be content with result.</p>
+
+<h3 id="budget">Budget</h3>
+
+<p>I would like to keep it all running on small VPS, but there might be additional requirements. So I will set upper line to 20$ a month.</p>
+
+<h3 id="quality">Quality</h3>
+
+<p>Quality must be good as it is my personal project.</p>
+
+<p><a href="/2020/08/26/planning-part-2.html">Part 2</a></p>
+
+					</div>
+				</section>
+			</div>
+		</div>
+
+		<div id="sidebar">
+  <div class="inner">
+    <!-- Menu -->
+    <nav id="menu">
+      <div class="image main round">
+        <img src="/assets/images/me.jpeg" alt="Me" />
+      </div>
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="/index.html">Homepage</a></li>
+        <li><a href="/projects.html">Projects</a></li>
+        <li><a href="/katas.html">Code katas</a></li>
+        <li><a href="/blog.html">Blog</a></li>
+        <li>
+          <span class="opener active">Posts</span>
+          <ul>
+            
+            <li><a href="/2020/10/13/cv-continuouse-delivery.html">2020-10-13 CV continuous delivery</a></li>
+            
+            <li><a href="/2020/09/07/one-man-scrum-iter-1-fail-iter-2-planning.html">2020-09-07 One man scrum. React blog. Iteration 1: failed. Iteration 2: planning.</a></li>
+            
+            <li><a href="/2020/08/27/one-man-scrum-iter-1-planning.html">2020-08-27 One man scrum. React blog. Iteration 1: planning.</a></li>
+            
+            <li><a href="/2020/08/26/planning-part-2.html">2020-08-26 React blog project planning part 2</a></li>
+            
+            <li><a href="/2020/08/25/planning.html">2020-08-25 React blog project planning part 1</a></li>
+            
+            <li><a href="/2020/08/05/python-strict-yaml-deserialization.html">2020-08-05 Strict YAML deserialization with marshmallow</a></li>
+            
+            <li><a href="/2020/06/18/how-my-blog-works.html">2020-06-18 How my blog works</a></li>
+            
+            <li><a href="/2019/12/17/second-planning.html">2019-12-17 Second planning attempt</a></li>
+            
+            <li><a href="/2019/12/14/planning.html">2019-12-14 Planning</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">Design based on: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+
+  </div>
+</div>
+	</div>
+
+	<!-- Scripts -->
+	<script src="/assets/js/jquery.min.js"></script>
+	<script src="/assets/js/browser.min.js"></script>
+	<script src="/assets/js/breakpoints.min.js"></script>
+	<script src="/assets/js/util.js"></script>
+	<script src="/assets/js/main.js"></script>
+
+</body>
+
+</html>
