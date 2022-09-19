@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>A paradigm shift: from dogebuild as universal buider to make alternative</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="/assets/css/styles.css" />
+</head>
+
+<body class="is-preload">
+	<div id="wrapper">
+		<div id="main">
+			<div class="inner">
+
+				<header id="header">
+					<span href="#" class="logo">
+						<h2>A paradigm shift: from dogebuild as universal buider to make alternative</h2>
+					</span>
+				</header>
+
+				<section id="banner">
+					<div class="content">
+						<h2 id="rants-and-sorrow">Rants and sorrow</h2>
+<p>Well, this is a hard article for me because this is in some way postmortem for dogebuild. But things are not that bad after all.</p>
+
+<p>I have lost my fate in dogebuild as universal builder. The main reason: I’ve worked for a certain time with mass migration from gradle to yandex inner CMake-like tool. I’ve found that all gradle build configurations are small projects by themselves. That led to a lot of small troubles when I’ve tried to migrate them. And after that I’ve thought: Do I really want to create dogebuild as flexible as gradle to maintain build tool just with another language? What if my source of inspiration was not so good?</p>
+
+<p>Maybe I am too old now, but I think now that maven in core concepts is better than gradle. Maven lacks flexibility, but strict way to build application is better. You shouldn’t use whatever code layout you have and then wrap it all with glue groovy code in build.gradle.
+That only leads to a lot of hacks when developers do not understand what happens and just trows a lot of code to the build script in hope of it will somehow work. In a couple of years of active development, no one would understand what big parts of that file does and why configuration was made this way but not another.</p>
+
+<p>I’ve designed dogebuild as a universal build system for any use-case, but now I think there are two of them, and they are very different.</p>
+
+<h2 id="quick-and-dirty-use-case">Quick and dirty use-case</h2>
+<p>I’ve used dogebuild for a couple of small projects with less than 10 build steps in make mode. See <a href="https://github.com/kirillsulim/cv/blob/master/dogefile.py">my CV build script</a> for example. That was a way much verboser than Makefile, but as far as I use Makefiles not so often I’ve always forgotten its syntax or how to set a variable. So it works for me very well.
+To cover this use-case, I would like to extract make mode functionality to separate tool <a href="https://github.com/kirillsulim/oak-build">oak-build</a>. I would like to build it without any plugin interfaces. Just a bunch of helper functions for different cases. Dogebuild flexibility and inevitable mess won’t be a major problem for small projects as it will be write-and-forget code. And in case of need to remember what the hell was written, python syntax should really simplify that comparing to make.</p>
+
+<h2 id="medium-and-big-projects-use-case">Medium and big projects use-case</h2>
+<p>For medium and big projects, the flexibility of dogebuild is much dangerous. I described in the first part of that post why I am disappointed in such an idea now, and why I think that maven will be a better source of inspiration. For that use-case, I would like to start from the beginning with more fast and modern language (I mean <a href="https://go.dev/">go-lang</a>). The main idea would be: You don’t need any flexibility, build system must provide little or no configurable building blocks that connect to each other via standard interfaces.
+In that case, plugin system is crucial to project as far as there will be fewer ways to glue build steps together. Also, to avoid quick and dirty build files, a yaml syntax should be a good match. If it is improved maven then yaml is a good substitution for XML. That use-case will be cover with <a href="https://github.com/walnut-build">walnut-build</a>.</p>
+
+					</div>
+				</section>
+			</div>
+		</div>
+
+		<div id="sidebar">
+  <div class="inner">
+    <!-- Menu -->
+    <nav id="menu">
+      <div class="image main round">
+        <img src="/assets/images/me.jpeg" alt="Me" />
+      </div>
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="/index.html">Homepage</a></li>
+        <li><a href="/projects.html">Projects</a></li>
+        <li><a href="/katas.html">Code katas</a></li>
+        <li><a href="/blog.html">Blog</a></li>
+        <li>
+          <span class="opener active">Posts</span>
+          <ul>
+            
+            <li><a href="/2022/09/19/a-paradigm-shift.html">2022-09-19 A paradigm shift: from dogebuild as universal buider to make alternative</a></li>
+            
+            <li><a href="/2022/09/17/back-online.html">2022-09-17 Back online</a></li>
+            
+            <li><a href="/2020/10/13/cv-continuouse-delivery.html">2020-10-13 CV continuous delivery</a></li>
+            
+            <li><a href="/2020/09/07/one-man-scrum-iter-1-fail-iter-2-planning.html">2020-09-07 One man scrum. React blog. Iteration 1: failed. Iteration 2: planning.</a></li>
+            
+            <li><a href="/2020/08/27/one-man-scrum-iter-1-planning.html">2020-08-27 One man scrum. React blog. Iteration 1: planning.</a></li>
+            
+            <li><a href="/2020/08/26/planning-part-2.html">2020-08-26 React blog project planning part 2</a></li>
+            
+            <li><a href="/2020/08/25/planning.html">2020-08-25 React blog project planning part 1</a></li>
+            
+            <li><a href="/2020/08/05/python-strict-yaml-deserialization.html">2020-08-05 Strict YAML deserialization with marshmallow</a></li>
+            
+            <li><a href="/2020/06/18/how-my-blog-works.html">2020-06-18 How my blog works</a></li>
+            
+            <li><a href="/2019/12/17/second-planning.html">2019-12-17 Second planning attempt</a></li>
+            
+            <li><a href="/2019/12/14/planning.html">2019-12-14 Planning</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">Design based on: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+
+  </div>
+</div>
+	</div>
+
+	<!-- Scripts -->
+	<script src="/assets/js/jquery.min.js"></script>
+	<script src="/assets/js/browser.min.js"></script>
+	<script src="/assets/js/breakpoints.min.js"></script>
+	<script src="/assets/js/util.js"></script>
+	<script src="/assets/js/main.js"></script>
+
+</body>
+
+</html>
